@@ -3,6 +3,8 @@
 const blessed = require('blessed');
 const _ = require('lodash');
 const Utils = require('./utils');
+const screen = require('./screen');
+
 
 const defaultConfig = {
     keys: true,
@@ -28,11 +30,10 @@ const actions = {
  * Class depicting a list of actions available for a given file system item
  */
 class ActionsList extends blessed.list {
-    constructor(screen, match, matchType, onDestroy, config) {
+    constructor(match, matchType, onDestroy, config) {
         config = _.merge({}, defaultConfig, config || {});
         super(config);
         this.config = config;
-        this.screen = screen;
         this.match = match;
         this.matchType = matchType;
         this.actions = actions[matchType];
@@ -42,7 +43,7 @@ class ActionsList extends blessed.list {
         this.on('select', this.selectAction);
         this.key('left', this.cancel);
         this.focus();
-        this.screen.render();
+        screen.render();
     }
 
     getSelectedAction() {
@@ -56,7 +57,7 @@ class ActionsList extends blessed.list {
     cancel() {
         this.destroy();
         this.onDestroy();
-        this.screen.render();
+        screen.render();
     }
 }
 
