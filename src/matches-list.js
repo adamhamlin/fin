@@ -23,7 +23,7 @@ function mapMatches(matches) {
     return matches.map(match => {
         return {
             match: match,
-            type: fs.stat(match).then(function (res) {
+            type: fs.stat(match).then(res => {
                 if (res.isFile()) {
                     return 'file';
                 } else if (res.isDirectory()) {
@@ -33,7 +33,7 @@ function mapMatches(matches) {
                 } else {
                     return 'other';
                 }
-            })
+            }).catch(err => 'other')
         };
     });
 }

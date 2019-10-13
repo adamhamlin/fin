@@ -36,11 +36,12 @@ let contentLayout = blessed.layout({
 screen.key(['escape', 'q', 'C-c'], Utils.quit);
 screen.render();
 
-let MAX_STREAM_EVENTS = 50; // TODO: figure out a way to increase this indefinitely w/o making sluggish
-let INITIAL_EVENT_LIMIT = 5;
-let EVENT_CHUNK_SIZE = 10;
+let MAX_MATCHES = 1000; // No real benefit in working to increase this
+let INITIAL_ITERS = 5;
+let STREAM_EVENT_CHUNK_SIZE = 10;
 let matchesList;
-let iter = 1;
+let iter = 0;
+let numMatches = 0;
 let bufs = [];
 
 // Parse cmd line args and execute - assumed to be of form "fin [options][args]"
@@ -48,26 +49,31 @@ process.env.FIN_FIND_UTILITY = 'fd'; //remove this
 let cmd = process.env.FIN_FIND_UTILITY || 'find';
 let child = spawn(cmd, process.argv.slice(2), {stdio: ['ignore', 'pipe', 'pipe']});
 child.stdout.on('data', data => {
-    bufs.push(data);
-    if (iter === 1) {
-        let matches = Utils.getArrayFromBuffers(bufs);
-        matchesList = new MatchesList(screen, matches, { parent: contentLayout });
-        bufs = [];
-    } else if (iter <= INITIAL_EVENT_LIMIT || (iter <= MAX_STREAM_EVENTS && iter % EVENT_CHUNK_SIZE === 0)) {
-        // Append initial data immediately, then start chunking
-        matchesList.appendMatches(Utils.getArrayFromBuffers(bufs));
-        bufs = [];
-    }
     ++iter;
+    bufs.push(data);
+    // Process initial data immediately, then start chunking
+    if (iter <= INITIAL_ITERS || (numMatches <= MAX_MATCHES && iter % STREAM_EVENT_CHUNK_SIZE === 0)) {
+        let matches = Utils.getArrayFromBuffers(bufs);
+        if (iter === 1) {
+            matchesList = new MatchesList(screen, matches, { parent: contentLayout });
+        } else {
+            matchesList.appendMatches(matches);
+        }
+        bufs = [];
+        numMatches += matches.length;
+    }
 });
 child.stdout.on('end', () => {
-    if (iter <= MAX_STREAM_EVENTS) {
+    if (numMatches === 0) {
+        // Empty result set, just fail
+        screen.destroy();
+        console.log('No results for: "' + [cmd].concat(process.argv.slice(2)).join(' ') + '"\nPlease refine your search.');
+    } else if (numMatches <= MAX_MATCHES) {
         matchesList.appendMatches(Utils.getArrayFromBuffers(bufs));
-        bufs = [];
     } else {
-        // TODO: Make this better/pretty
-        console.log('TOO MANY RESULTS -- ONLY DISPLAYING FIRST ' + matchesList.matches.length + ' RESULTS');
+        console.log('ONLY DISPLAYING FIRST ' + matchesList.matches.length + ' RESULTS');
     }
+    bufs = [];
 });
 child.stderr.on('data', function (data) {
     // TODO: Figure out something else to do with error data
@@ -75,8 +81,7 @@ child.stderr.on('data', function (data) {
 });
 
 // GENERAL TODO:
-// - Handle case of empty result set
-// - Display bars with tool name, info, messages, etc.
+// - Display bars with info, messages, etc.? Make pretty
 // - More action options?
 // - Figure out if this can work with sudo
 // - Consolidate some of the configuration options e.g. styling
