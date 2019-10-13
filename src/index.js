@@ -10,12 +10,26 @@ let screen = blessed.screen({
     title: 'FIN'
 });
 
-let layout = blessed.layout({
+let baseLayout = blessed.layout({
     parent: screen,
     top: 'center',
     left: 'center',
     width: '100%',
     height: '100%'
+});
+
+let header = blessed.box({
+    parent: baseLayout,
+    width: '100%',
+    tags: true,
+    content: '{center}FIN{/center}',
+    border: {type: "line", fg: "cyan"}
+});
+
+let contentLayout = blessed.layout({
+    parent: baseLayout,
+    width: '100%',
+    height: 'shrink'
 });
 
 // Define global quit actions and render
@@ -37,7 +51,7 @@ child.stdout.on('data', data => {
     bufs.push(data);
     if (iter === 1) {
         let matches = Utils.getArrayFromBuffers(bufs);
-        matchesList = new MatchesList(screen, matches, { parent: layout });
+        matchesList = new MatchesList(screen, matches, { parent: contentLayout });
         bufs = [];
     } else if (iter <= INITIAL_EVENT_LIMIT || (iter <= MAX_STREAM_EVENTS && iter % EVENT_CHUNK_SIZE === 0)) {
         // Append initial data immediately, then start chunking
@@ -61,6 +75,8 @@ child.stderr.on('data', function (data) {
 });
 
 // GENERAL TODO:
+// - Handle case of empty result set
 // - Display bars with tool name, info, messages, etc.
 // - More action options?
 // - Figure out if this can work with sudo
+// - Consolidate some of the configuration options e.g. styling
