@@ -1,0 +1,22 @@
+{
+  "name": "fin",
+  "description": "A curses-based graphical cli wrapper for the fd utility",
+  "author": "Adam Hamlin",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "./src/index.js",
+  "bin": {
+    "fin": "./fin.js"
+  },
+  "preferGlobal": false,
+  "repository": "git://github.com/adamhamlin/fin.git",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "dependencies": {
+    "blessed": "0.1.81",
+    "clipboardy": "2.1.0",
+    "fs-extra": "8.1.0",
+    "lodash": "4.17.15"
+  }
+}
