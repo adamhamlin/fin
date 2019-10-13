@@ -86,5 +86,5 @@ module.exports = { quit, getArrayFromBuffers, executeAction };
 
 // NON-EXPORTED
 async function writeToClipboard(text) {
-    return clipboardy.write(text);
+    return clipboardy.write(_.trimEnd(text));
 }
