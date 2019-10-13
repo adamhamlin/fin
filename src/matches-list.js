@@ -5,6 +5,7 @@ const fs = require('fs-extra');
 const _ = require('lodash');
 const Utils = require('./utils');
 const ActionsList = require('./actions-list');
+const screen = require('./screen');
 
 const defaultConfig = {
     keys: true,
@@ -42,11 +43,10 @@ function mapMatches(matches) {
  * Class depicting a list of file system matches
  */
 class MatchesList extends blessed.list {
-    constructor(screen, matches, config) {
+    constructor(matches, config) {
         config = _.merge({}, defaultConfig, config || {});
         super(config);
         this.config = config;
-        this.screen = screen;
         this.matches = matches;
         this.matchesData = mapMatches(matches);
         this.actionsList = null;
@@ -56,14 +56,14 @@ class MatchesList extends blessed.list {
         this.key('right', this.selectMatch);
         this.key('left', Utils.quit);
         this.focus();
-        this.screen.render();
+        screen.render();
     }
 
     appendMatches(matches) {
         this.spliceItem(this.matches.length, 0, ...matches);
         this.matches = this.matches.concat(matches);
         this.matchesData = this.matchesData.concat(mapMatches(matches));
-        this.screen.render();
+        screen.render();
     }
 
     getSelectedMatch() {
@@ -81,7 +81,6 @@ class MatchesList extends blessed.list {
 
     async selectMatch() {
         this.actionsList = new ActionsList(
-            this.screen,
             this.getSelectedMatch().match,
             await this.getSelectedMatchType(),
             this.onActionListCancel.bind(this),

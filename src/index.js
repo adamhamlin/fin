@@ -4,11 +4,7 @@ const blessed = require('blessed');
 const { spawn } = require('child_process');
 const Utils = require('./utils');
 const MatchesList = require('./matches-list');
-
-let screen = blessed.screen({
-    smartCSR: true,
-    title: 'FIN'
-});
+const screen = require('./screen');
 
 let baseLayout = blessed.layout({
     parent: screen,
@@ -55,7 +51,7 @@ child.stdout.on('data', data => {
     if (iter <= INITIAL_ITERS || (numMatches <= MAX_MATCHES && iter % STREAM_EVENT_CHUNK_SIZE === 0)) {
         let matches = Utils.getArrayFromBuffers(bufs);
         if (iter === 1) {
-            matchesList = new MatchesList(screen, matches, { parent: contentLayout });
+            matchesList = new MatchesList(matches, { parent: contentLayout });
         } else {
             matchesList.appendMatches(matches);
         }
@@ -85,3 +81,4 @@ child.stderr.on('data', function (data) {
 // - More action options?
 // - Figure out if this can work with sudo
 // - Consolidate some of the configuration options e.g. styling
+// - Add type labels to match list?
