@@ -1,17 +1,17 @@
 {
-  "name": "fin",
+  "name": "frap",
   "description": "A curses-based graphical cli wrapper for the fd utility",
   "author": "Adam Hamlin",
   "version": "0.1.0",
   "license": "MIT",
   "main": "./src/index.js",
   "bin": {
-    "fin": "./fin.js"
+    "frap": "./frap.js"
   },
   "preferGlobal": false,
-  "repository": "git://github.com/adamhamlin/fin.git",
+  "repository": "git://github.com/adamhamlin/frap.git",
   "engines": {
-    "node": ">= 0.8.0"
+    "node": ">=8.0.0"
   },
   "dependencies": {
     "blessed": "0.1.81",
