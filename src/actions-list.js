@@ -66,7 +66,7 @@ class ActionsList extends blessed.list {
         // Set list, bind watchers, and display
         this.setItems(this.actions);
         this.on('select', this.selectAction);
-        this.on('right', this.selectAction);
+        this.key('right', this.selectAction);
         this.key('left', this.cancel);
         this.focus();
         screen.render();
