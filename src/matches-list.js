@@ -9,15 +9,16 @@ const screen = require('./screen');
 
 const defaultConfig = {
     keys: true,
+    vi: true,
     fg: 'white',
     selectedFg: 'white',
     selectedBg: 'blue',
     label: 'Matches',
-    width: '75%',
+    width: '79%',
     height: '100%',
-    border: {type: "line", fg: "cyan"},
+    border: {type: 'line', fg: 'cyan'},
     columnSpacing: 10, //in chars,
-    columnWidth: [16, 12, 12] /*in chars*/
+    columnWidth: [16, 12, 12], /*in chars*/
 };
 
 function mapMatches(matches) {
@@ -39,12 +40,33 @@ function mapMatches(matches) {
     });
 }
 
+function getSearchFn(config) {
+    return callback => {
+        let prompt = blessed.prompt({
+            parent: config.parent,
+            height: '100%',
+            width: '21%',
+            keys: true,
+            vi: true,
+            tags: true,
+            border: { type: 'line', fg: 'cyan' }
+        });
+        prompt.input('Enter search string:', '', (err, value) => {
+            prompt.destroy();
+            if (!err) {
+                return callback(null, value);
+            }
+        });
+    }
+}
+
 /**
  * Class depicting a list of file system matches
  */
 class MatchesList extends blessed.list {
     constructor(matches, config) {
         config = _.merge({}, defaultConfig, config || {});
+        config.search = getSearchFn(config);
         super(config);
         this.config = config;
         this.matches = matches;
@@ -60,10 +82,12 @@ class MatchesList extends blessed.list {
     }
 
     appendMatches(matches) {
-        this.spliceItem(this.matches.length, 0, ...matches);
-        this.matches = this.matches.concat(matches);
-        this.matchesData = this.matchesData.concat(mapMatches(matches));
-        screen.render();
+        if (matches.length) {
+            this.spliceItem(this.matches.length, 0, ...matches);
+            this.matches = this.matches.concat(matches);
+            this.matchesData = this.matchesData.concat(mapMatches(matches));
+            screen.render();
+        }
     }
 
     getSelectedMatch() {

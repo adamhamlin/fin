@@ -3,6 +3,7 @@
 const blessed = require('blessed');
 const _ = require('lodash');
 const Utils = require('./utils');
+const Actions = require('./constants').Actions;
 const screen = require('./screen');
 
 
@@ -12,18 +13,37 @@ const defaultConfig = {
     selectedFg: 'white',
     selectedBg: 'blue',
     label: 'Actions',
-    width: '25%',
+    width: '21%',
     height: '100%',
-    border: {type: "line", fg: "cyan"},
+    border: { type: 'line', fg: 'cyan' },
     columnSpacing: 10, //in chars,
     columnWidth: [16, 12, 12] /*in chars*/
 };
 
 const actions = {
-    file: ['Copy match exactly', 'Copy absolute path', 'Copy file name', 'Copy parent directory path', 'Copy file contents'],
-    directory: ['Copy match exactly', 'Copy absolute path', 'Copy directory name', 'Copy parent directory path'],
-    link: ['Copy match exactly', 'Copy absolute path', 'Copy parent directory path'],
-    other: ['Copy match exactly', 'Copy absolute path', 'Copy parent directory path']
+    file: [
+        Actions.COPY_MATCH_EXACTLY,
+        Actions.COPY_ABSOLUTE_PATH,
+        Actions.COPY_FILE_NAME,
+        Actions.COPY_FILE_CONTENTS,
+        Actions.COPY_PARENT_DIRECTORY_PATH
+    ],
+    directory: [
+        Actions.COPY_MATCH_EXACTLY,
+        Actions.COPY_ABSOLUTE_PATH,
+        Actions.COPY_DIRECTORY_NAME,
+        Actions.COPY_PARENT_DIRECTORY_PATH
+    ],
+    link: [
+        Actions.COPY_MATCH_EXACTLY,
+        Actions.COPY_ABSOLUTE_PATH,
+        Actions.COPY_PARENT_DIRECTORY_PATH
+    ],
+    other: [
+        Actions.COPY_MATCH_EXACTLY,
+        Actions.COPY_ABSOLUTE_PATH,
+        Actions.COPY_PARENT_DIRECTORY_PATH
+    ]
 };
 
 /**
@@ -37,10 +57,16 @@ class ActionsList extends blessed.list {
         this.match = match;
         this.matchType = matchType;
         this.actions = actions[matchType];
+        // If path is absolute, swap in the COPY_RELATIVE_PATH action
+        if (_.startsWith(match, '/')) {
+            this.actions = _.clone(this.actions);
+            this.actions.splice(this.actions.indexOf(Actions.COPY_ABSOLUTE_PATH), 1, Actions.COPY_RELATIVE_PATH);
+        }
         this.onDestroy = onDestroy;
         // Set list, bind watchers, and display
         this.setItems(this.actions);
         this.on('select', this.selectAction);
+        this.on('right', this.selectAction);
         this.key('left', this.cancel);
         this.focus();
         screen.render();

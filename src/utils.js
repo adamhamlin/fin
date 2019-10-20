@@ -4,6 +4,7 @@ const clipboardy = require('clipboardy');
 const path = require('path');
 const fs = require('fs-extra');
 const _ = require('lodash');
+const Actions = require('./constants').Actions;
 
 function quit(exitCode) {
     return process.exit(exitCode || 0);
@@ -11,41 +12,35 @@ function quit(exitCode) {
 
 function getArrayFromBuffers(bufs) {
     let result = Buffer.concat(bufs).toString().split('\n');
-    // Omit trailing newline w/ empty string
-    return result.slice(0, result.length - 1);
+    return _.dropRightWhile(result, el => el === '');
 }
 
 async function executeAction(action, match) {
     const actionToFunctionMap = {
-        'Copy match exactly': async function (match) {
+        [Actions.COPY_MATCH_EXACTLY]: async function (match) {
             return writeToClipboard(match);
         },
-        'Copy absolute path': async function (match) {
+        [Actions.COPY_ABSOLUTE_PATH]: async function (match) {
             return writeToClipboard(path.resolve(match));
         },
-        'Copy file name': async function (match) {
-            return writeToClipboard(path.basename(match));
+        [Actions.COPY_RELATIVE_PATH]: async function (match) {
+            return writeToClipboard(path.relative('', match));
         },
-        'Copy directory name': async function (match) {
-            return writeToClipboard(path.basename(match));
-        },
-        'Copy link name': async function (match) {
-            return writeToClipboard(path.basename(match));
-        },
-        'Copy name': async function (match) {
-            return writeToClipboard(path.basename(match));
-        },
-        'Copy parent directory path': async function (match) {
+        [Actions.COPY_FILE_NAME]: copyBasename,
+        [Actions.COPY_DIRECTORY_NAME]: copyBasename,
+        [Actions.COPY_LINK_NAME]: copyBasename,
+        [Actions.COPY_NAME]: copyBasename,
+        [Actions.COPY_PARENT_DIRECTORY_PATH]: async function (match) {
             return writeToClipboard(path.dirname(match));
         },
-        'Copy file contents': async function (match) {
+        [Actions.COPY_FILE_CONTENTS]: async function (match) {
             let contents = await fs.readFile(match, 'utf8');
             if (!contents) {
                 throw new Error(`File ${path.basename(match)} is empty!`);
             }
             return writeToClipboard(contents);
         },
-        'Open file in editor': async function (match) {
+        [Actions.OPEN_FILE_IN_EDITOR]: async function (match) {
             // openEditor([{
             //     file: match,
             //     line: 1,
@@ -67,10 +62,10 @@ async function executeAction(action, match) {
             //     detached: true
             // });
             // child.on('exit', function (e, code) {
-            //     console.log("Editor closed!");
+            //     console.log('Editor closed!');
             // });
             //shell.exec(`vi ${match}`);
-            console.log("NOT IMPLEMENTED!");
+            console.log('NOT IMPLEMENTED!');
         }
     }
 
@@ -87,4 +82,8 @@ module.exports = { quit, getArrayFromBuffers, executeAction };
 // NON-EXPORTED
 async function writeToClipboard(text) {
     return clipboardy.write(_.trimEnd(text));
+}
+
+async function copyBasename(match) {
+    return writeToClipboard(path.basename(match));
 }

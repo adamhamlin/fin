@@ -19,7 +19,7 @@ let header = blessed.box({
     width: '100%',
     tags: true,
     content: '{center}FIN{/center}',
-    border: {type: "line", fg: "cyan"}
+    border: {type: 'line', fg: '#0052d4'}
 });
 
 let contentLayout = blessed.layout({
@@ -32,7 +32,7 @@ let contentLayout = blessed.layout({
 screen.key(['escape', 'q', 'C-c'], Utils.quit);
 screen.render();
 
-let MAX_MATCHES = 1000; // No real benefit in working to increase this
+let MAX_MATCHES = 1000; // No big benefit in working to increase this
 let INITIAL_ITERS = 5;
 let STREAM_EVENT_CHUNK_SIZE = 10;
 let matchesList;
@@ -65,7 +65,14 @@ child.stdout.on('end', () => {
         screen.destroy();
         console.log('No results for: "' + [cmd].concat(process.argv.slice(2)).join(' ') + '"\nPlease refine your search.');
     } else if (numMatches <= MAX_MATCHES) {
-        matchesList.appendMatches(Utils.getArrayFromBuffers(bufs));
+        let matches = Utils.getArrayFromBuffers(bufs);
+        matchesList.appendMatches(matches);
+        numMatches += matches.length;
+        // Auto-select if only 1 result
+        if (numMatches === 1) {
+            matchesList.selectMatch();
+        }
+        console.log('DISPLAYING ' + numMatches + ' RESULTS');
     } else {
         console.log('ONLY DISPLAYING FIRST ' + matchesList.matches.length + ' RESULTS');
     }
@@ -78,7 +85,10 @@ child.stderr.on('data', function (data) {
 
 // GENERAL TODO:
 // - Display bars with info, messages, etc.? Make pretty
-// - More action options?
+// - Implement own search function to allow traversing thru matches, not just finding the first one
+// - Fix open file in editor? Maybe I needed to destroy screen first...
 // - Figure out if this can work with sudo
 // - Consolidate some of the configuration options e.g. styling
 // - Add type labels to match list?
+// - Sideways scroll for long matches? Otherwise, ellipsis-ize them?
+// - More action options?
