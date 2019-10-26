@@ -2,9 +2,13 @@
   "name": "@adamhamlin/frap",
   "description": "A curses-based terminal ui wrapper for your \"find\"-like utility",
   "author": "Adam Hamlin <achamlin@gmail.com>",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "main": "./src/index.js",
+  "files": [
+    "src",
+    "frap.js"
+  ],
   "bin": {
     "frap": "./frap.js"
   },
