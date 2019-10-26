@@ -9,6 +9,7 @@ const screen = require('./screen');
 
 const defaultConfig = {
     keys: true,
+    vi: true,
     fg: 'white',
     selectedFg: 'white',
     selectedBg: 'blue',
@@ -54,6 +55,13 @@ class ActionsList extends blessed.list {
         config = _.merge({}, defaultConfig, config || {});
         super(config);
         this.config = config;
+        this._info = blessed.box({
+            parent: this,
+            bottom: 4,
+            height: 3,
+            left: 2,
+            right: 2
+        });
         this.match = match;
         this.matchType = matchType;
         this.actions = actions[matchType];
@@ -77,10 +85,16 @@ class ActionsList extends blessed.list {
     }
 
     async selectAction() {
-        await Utils.executeAction(this.getSelectedAction(), this.match);
+        try {
+            await Utils.executeAction(this.getSelectedAction(), this.match);
+        } catch (err) {
+            this._info.setContent(err.message);
+            screen.render();
+        }
     }
 
     cancel() {
+        this._info.destroy();
         this.destroy();
         this.onDestroy();
         screen.render();

@@ -36,7 +36,7 @@ async function executeAction(action, match) {
         [Actions.COPY_FILE_CONTENTS]: async function (match) {
             let contents = await fs.readFile(match, 'utf8');
             if (!contents) {
-                throw new Error(`File ${path.basename(match)} is empty!`);
+                throw new Error('Selected file is empty!');
             }
             return writeToClipboard(contents);
         },
@@ -65,16 +65,12 @@ async function executeAction(action, match) {
             //     console.log('Editor closed!');
             // });
             //shell.exec(`vi ${match}`);
-            console.log('NOT IMPLEMENTED!');
+            throw new Error('NOT IMPLEMENTED!');
         }
     }
 
-    try {
-        await actionToFunctionMap[action](match);
-        quit();
-    } catch (err) {
-        console.error('ERROR EXECUTING ACTION! ' + err.message);
-    }
+    await actionToFunctionMap[action](match);
+    quit();
 }
 
 module.exports = { quit, getArrayFromBuffers, executeAction };

@@ -1,17 +1,19 @@
 {
-  "name": "frap",
-  "description": "A curses-based graphical cli wrapper for the fd utility",
-  "author": "Adam Hamlin",
+  "name": "@adamhamlin/frap",
+  "description": "A curses-based terminal ui wrapper for your \"find\"-like utility",
+  "author": "Adam Hamlin <achamlin@gmail.com>",
   "version": "0.1.0",
   "license": "MIT",
   "main": "./src/index.js",
   "bin": {
     "frap": "./frap.js"
   },
-  "preferGlobal": false,
   "repository": "git://github.com/adamhamlin/frap.git",
   "engines": {
     "node": ">=8.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "blessed": "0.1.81",

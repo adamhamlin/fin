@@ -18,7 +18,7 @@ let header = blessed.box({
     parent: baseLayout,
     width: '100%',
     tags: true,
-    content: '{center}FIN{/center}',
+    content: '{center}FRAP{/center}',
     border: {type: 'line', fg: '#0052d4'}
 });
 
@@ -41,9 +41,8 @@ let numMatches = 0;
 let bufs = [];
 
 // Parse cmd line args and execute - assumed to be of form "fin [options][args]"
-process.env.FIN_FIND_UTILITY = 'fd'; //remove this
-let cmd = process.env.FIN_FIND_UTILITY || 'find';
-let child = spawn(cmd, process.argv.slice(2), {stdio: ['ignore', 'pipe', 'pipe']});
+let cmd = process.env.FRAP_FIND_UTILITY || 'find';
+let child = spawn(cmd, process.argv.slice(2), { stdio: ['ignore', 'pipe', 'pipe'] });
 child.stdout.on('data', data => {
     ++iter;
     bufs.push(data);
@@ -78,14 +77,13 @@ child.stdout.on('end', () => {
     }
     bufs = [];
 });
-child.stderr.on('data', function (data) {
+child.stderr.on('data', data => {
     // TODO: Figure out something else to do with error data
     console.log('stderr: ' + data.toString());
 });
 
 // GENERAL TODO:
 // - Display bars with info, messages, etc.? Make pretty
-// - Implement own search function to allow traversing thru matches, not just finding the first one
 // - Fix open file in editor? Maybe I needed to destroy screen first...
 // - Figure out if this can work with sudo
 // - Consolidate some of the configuration options e.g. styling
