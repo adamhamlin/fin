@@ -2,7 +2,7 @@
 
 A terminal UI wrapper for your "find"-like utility. Quickly perform basic operations on the results of your find command, like copying paths, file/directory names, or file contents.
 
-[![asciicast](https://asciinema.org/a/277176.svg)](https://asciinema.org/a/277176?autoplay=1&loop=1)
+![Frap Demo](demo/demo.gif)
 
 ## Using frap
 If you want to wrap the following command with frap:
