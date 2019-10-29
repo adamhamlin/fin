@@ -2,7 +2,7 @@
   "name": "@adamhamlin/frap",
   "description": "A curses-based terminal ui wrapper for your \"find\"-like utility",
   "author": "Adam Hamlin <achamlin@gmail.com>",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "MIT",
   "main": "./src/index.js",
   "files": [
@@ -16,6 +16,18 @@
   "engines": {
     "node": ">=8.0.0"
   },
+  "keywords": [
+    "find",
+    "files",
+    "find-files",
+    "frap",
+    "terminal",
+    "terminal-ui",
+    "terminal-app",
+    "terminal-utilities",
+    "utility",
+    "wrapper"
+  ],
   "publishConfig": {
     "access": "public"
   },
