@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "blessed": "0.1.81",
-    "clipboardy": "2.1.0",
+    "clipboardy": "3.0.0",
     "fs-extra": "8.1.0",
     "lodash": "^4.17.21"
   }
